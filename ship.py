@@ -6,9 +6,9 @@ import pygame
 class Ship():
     """初始化飞船并设置初始位置"""
 
-    def __init__(self, ai_setings, screen):
+    def __init__(self, ai_settings, screen):
         self.screen = screen
-        self.ai_setings = ai_setings
+        self.ai_settings = ai_settings
 
         # 加载飞船并获取外接矩形
         self.image = pygame.image.load('images/ship.bmp')
@@ -25,14 +25,17 @@ class Ship():
         # 移动标志
         self.moving_right = False
         self.moving_left = False
+        # self.moving_up = False
+        # self.moving_down = False
 
     def update(self):
         """更新飞船移动位置"""
         # 更新飞船的center 值
         if self.moving_right and self.rect.right < self.screen_rect.right:
-            self.center += self.ai_setings.ship_speed_factor
+            self.center += self.ai_settings.ship_speed_factor
         if self.moving_left and self.rect.left > 0:
-            self.center -= self.ai_setings.ship_speed_factor
+            self.center -= self.ai_settings.ship_speed_factor
+
 
         # 根据self.center更新rect对象
         self.rect.centerx = self.center
