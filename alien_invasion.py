@@ -1,52 +1,50 @@
-# /bin/etc/env Python3
-# -*- coding: utf-8 -*-
-import sys
 import pygame
 from pygame.sprite import Group
 
 from settings import Settings
+from game_stats import GameStats
+from scoreboard import Scoreboard
+from button import Button
 from ship import Ship
+
 import game_fuctions as gf
 
 
-
 def run_game():
-    """初始化游戏并创建一个窗口对象"""
-    pygame.init()  # 初始化背景
+    # Initialize pygame, settings, and screen object.
+    pygame.init()
     ai_settings = Settings()
-    screen = pygame.display.set_mode(
-        (ai_settings.screen_height,
-         ai_settings.screen_width))  # 创建一个显示窗口，使用实参创建一个窗口。
+    screen = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
     pygame.display.set_caption("Alien Invasion")
 
-    #设置北京颜色
-    bg_color = (230,230,230)
+    # Make the Play button.
+    play_button = Button(ai_settings, screen, "Play")
 
-    # 创建一艘飞船
+    # Create an instance to store game statistics, and a scoreboard.
+    stats = GameStats(ai_settings)
+    sb = Scoreboard(ai_settings, screen, stats)
+
+    # Set the background color.
+    bg_color = (230, 230, 230)
+
+    # Make a ship, a group of bullets, and a group of aliens.
     ship = Ship(ai_settings, screen)
-    # 创建一个用于存储子弹的编组
     bullets = Group()
+    aliens = Group()
 
-    while True:  # 使用while循环来循环一个事件
-        # 监听键盘鼠标事件
-        # for event in pygame.event.get(
-        # ):  # for循环做事件的循环。pygame.event.get()所有键盘鼠标事件豆浆促使for循环运行。
-        #     if event.type == pygame.QUIT:  # 在for循环中，判断如果发生窗口关闭事件，则调用sys.exit()来退出游戏。
-        #         sys.exit()  # 退出时，使用sys模块退出。
-        gf.check_events(ai_settings, screen, ship, bullets)
+    # Create the fleet of aliens.
+    gf.create_fleet(ai_settings, screen, ship, aliens)
 
-        ship.update()
+    # Start the main loop for the game.
+    while True:
+        gf.check_events(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets)
 
-        gf.update_bullets(bullets)
+        if stats.game_active:
+            ship.update()
+            gf.update_bullets(ai_settings, screen, stats, sb, ship, aliens, bullets)
+            gf.update_aliens(ai_settings, screen, stats, sb, ship, aliens, bullets)
 
-
-        # 每次循环重新绘制屏幕ÒÒ
-        # screen.fill(ai_settings.bg_color)
-        # ship.blitme()
-        #
-        # # 让最新的屏幕可见。
-        # pygame.display.flip()  # 绘制一个空屏幕，并擦去旧屏幕。可以理解为刷新屏幕。
-        gf.update_screen(ai_settings, screen, ship, bullets)
+        gf.update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_button)
 
 
 run_game()
